@@ -1,0 +1,124 @@
+---
+author: "Darin Christensen and Thiemo Fetzer"
+date: "August 21, 2017"
+output:
+  html_document:
+    highlight: tango
+    keep_md: yes
+    theme: readable
+    toc_depth: 4
+---
+
+### Correction: Conley Standard Errors
+
+[Darin Christensen](http://darinchristensen.com/) and [Thiemo Fetzer](http://www.trfetzer.com/)
+
+```{r chunk_options, include = FALSE}
+rm(list = ls())
+pkgs <- c("knitr", "dplyr", "data.table", "foreign","ggplot2")
+sapply(pkgs, require, character.only = TRUE)
+
+opts_knit$set(root.dir = "../")
+
+opts_chunk$set(fig.width = 7, fig.height = 5, fig.align = "center",
+    dev = 'png', warning = FALSE, message = FALSE,
+    echo = FALSE, tidy = FALSE, comment = "")
+
+options(width = 65, digits = 4)
+```
+
+***
+
+[Jordan Adamson](https://sites.google.com/a/g.clemson.edu/ja-resources/) found an error in the code that Solomon Hsiang developed to compute Conley standard errors in Stata. Unfortunately, we transcribed this error when we implemented Hsiang's code in C++ and R. These errors happen, and Hsiang clearly warns users at the top of his code.
+
+The problem is a single misplaced parathesis in the line calcluating the weight for the Bartlett kernel when correcting for temporal auto-correlation: `weight = (1:-abs(time1[t,1] :- time1))/(lag_cutoff+1)` (line 430 in the original ado file, version dated 4/29/2013).
+
+Per Newey and West (1987), the Bartlett kernel is $$K_j = 1 - \frac{|j|}{m + 1}$$ 
+
+However, the line above instead computes: $$K_j = \frac{1 - |j|}{m + 1}$$
+
+The fix is simple: the third parenthesis needs to be moved to the end of the line. Unfortunately, the fix is also consequential, as the uncorrected code can deliver negative weights and lead to standard errors that are **too small** when there is temporal auto-correlation.
+
+Our old and new code is now posted in a public GitHub repo: https://github.com/darinchristensen/conley-se . 
+
+***
+#### Original Code
+
+Here's the original Stata implementation.
+
+```{r stata_code, eval = FALSE, echo = TRUE}
+clear
+use "data/new_testspatial.dta"
+
+tab year, gen(yy_)
+tab FIPS, gen(FIPS_)
+
+ols_spatial_HAC EmpClean00 HDD CDD yy_* FIPS_2-FIPS_362,
+    lat(lat ) lon(lon ) t(year) p(FIPS) dist(500) lag(5) bartlett disp
+```
+
+This code delivers the following standard errors: 
+
+```{r eval = FALSE, echo = TRUE}
+-----------------------------------------------
+    Variable |   OLS      spatial    spatHAC   
+-------------+---------------------------------
+         HDD |    0.650      0.886      0.894  
+         CDD |    1.493      4.068      4.388  
+```
+
+And our original C++/R implementation:
+
+```{r felm, echo = TRUE}
+# Loading sample data:
+dt <- read.dta("data/new_testspatial.dta") %>% data.table()
+setnames(dt, c("latitude", "longitude"), c("lat", "lon"))
+
+# Loading R function to compute Conley SEs:
+source("code/archived-code/deprecated-conley.R")
+
+m <- felm(EmpClean00 ~ HDD + CDD | year + FIPS | 0 | lat + lon,
+  data = dt[!is.na(EmpClean00)], keepCX = TRUE)
+
+SE <- ConleySEs(reg = m,
+    unit = "FIPS", 
+    time = "year",
+    lat = "lat", lon = "lon",
+    dist_fn = "SH", dist_cutoff = 500, 
+    lag_cutoff = 5,
+    cores = 1, 
+    verbose = FALSE) 
+
+sapply(SE, function(x) diag(sqrt(x))) %>% round(3)
+```
+
+This matches the standard errors from the Stata output.
+
+*** 
+
+#### Corrected Code
+
+Jordan caught the transcribed error on line 183 of our C++ code. Per Newey and West (1987), we correct `(1 - t_diff[j]) / (cutoff + 1)` to `(1 - t_diff[j] / (cutoff + 1))` and recompute the standard errors. 
+
+```{r revised, echo = TRUE}
+source("code/conley.R")
+
+SE <- ConleySEs(reg = m,
+    unit = "FIPS", 
+    time = "year",
+    lat = "lat", lon = "lon",
+    dist_fn = "SH", dist_cutoff = 500, 
+    lag_cutoff = 5,
+    cores = 1, 
+    verbose = FALSE) 
+
+sapply(SE, function(x) diag(sqrt(x))) %>% round(3)
+```
+
+As is apparent from the final column, correcting the error meaningfully changes the standard errors in the last column. Thiemo's data is a bit unusual; in other applications, we find that the standard errors tend to increase after one corrects for temporal auto-correlation. 
+
+***
+```{r session_info, echo = TRUE}
+sessionInfo()
+```
+***
