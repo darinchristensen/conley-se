@@ -155,9 +155,9 @@ arma::mat XeeXhC(arma::mat M, double cutoff,
 // [[Rcpp::export]]
 arma::mat Bal_XeeXhC(arma::mat dmat,
    arma::mat X, arma::vec e, int n1, int k){
-    
+
     long long int nrow = dmat.n_rows;
-    
+
     arma::mat XeeXh(k, k, fill::zeros);
     for( long long int i = 0; i < nrow; i++ ){
         arma::mat e_mat(1, n1, fill::zeros);
