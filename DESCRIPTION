@@ -1,0 +1,27 @@
+Package: ConleySE
+Title: Functions to calculate Conley Standard Errors
+Version: 0.0.0.9000
+Authors@R: person("Nicholas", "Potter", email = "potter.nicholas@gmail.com", role = c("aut", "cre"))
+Description: Functions to calculate Conley Standard Errors. This package is 
+  essentially a repackaging of work done by 
+  \href{Darin Christiansen}{https://darinchristensen.com/} and 
+  \href{Theimo Fetzer}{http://www.trfetzer.com/}, which is itself based on work
+  by Solomon Hsiang, with an error caught by 
+  \href{Jordan Adamson}{https://sites.google.com/view/jordan-adamson}. 
+  Christensen and Fetzer's 
+  \href{github repo}{https://github.com/darinchristensen/conley-se} is the 
+  original source for this package.
+Depends: R (>= 3.2.0)
+Imports:
+  Rcpp,
+  RcppArmadillo
+Suggests:
+  knitr,
+  rmarkdown,
+  testthat
+License: MIT + file LICENSE
+LazyData: true
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 6.1.1
+VignetteBuilder: knitr
+Encoding: UTF-8
