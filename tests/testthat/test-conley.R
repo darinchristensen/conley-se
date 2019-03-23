@@ -4,10 +4,9 @@ library("ConleySE")
 
 # Loading test data:
 data("conley_spatial")
-data("petersen2006")
 
 test_that("OLS model using lm() works", {
-  cs2012 <- conley_spatial[conley_spatial$year == 2012]
+  cs2012 <- conley_spatial[conley_spatial$year == 2012,]
   m1 <- lm(EmpClean00 ~ HDD + CDD, data = cs2012)
   expected_res <- c(61203.928, 13.629, 37.000)
   names(expected_res) <- c("(Intercept)", "HDD", "CDD")

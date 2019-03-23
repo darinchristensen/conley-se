@@ -35,7 +35,7 @@ ConleySE.lm <- function(model, x, y,
   # Get X matrix of covariates
   Xvars <- names(model$model[,-1])
   if("(Intercept)" %in% names(model$coefficients)) {
-    X <- cbind(rep(1, n), as.matrix(model$model[,-1]))
+    X <- cbind(rep(1, nrow(model$model)), as.matrix(model$model[,-1]))
     colnames(X) <- c("(Intercept)", Xvars)
   } else {
     X <- as.matrix(model$model[,-1])
