@@ -33,14 +33,8 @@ ConleySE.lm <- function(model, x, y,
                         lat_scale = 111, verbose = FALSE) {
   
   # Get X matrix of covariates
-  Xvars <- names(model$model[,-1])
-  if("(Intercept)" %in% names(model$coefficients)) {
-    X <- cbind(rep(1, nrow(model$model)), as.matrix(model$model[,-1]))
-    colnames(X) <- c("(Intercept)", Xvars)
-  } else {
-    X <- as.matrix(model$model[,-1])
-  }
-  
+  X <- model.matrix(model)
+  wgts <- m1$weights
   e <- model$residuals
   
   # Number of rows and covariates
