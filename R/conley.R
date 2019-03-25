@@ -34,7 +34,8 @@ ConleySE.lm <- function(model, x, y,
   
   # Get X matrix of covariates
   X <- model.matrix(model)
-  wgts <- m1$weights
+  X_vars <- colnames(X)
+  wgts <- model$weights
   e <- model$residuals
   
   # Number of rows and covariates
@@ -48,7 +49,13 @@ ConleySE.lm <- function(model, x, y,
   XeeX <- Bal_XeeXhC(d, X, e, n, k)
   
   # (X'X)^-1
-  invXX <- solve(crossprod(X)) * n
+  if(require(corpcor)) {
+    invXX <- corpcor::pseudoinverse(crossprod(X)) * n
+    rownames(invXX) <- X_vars
+    colnames(invXX) <- X_vars
+  } else {
+    invXX <- solve(crossprod(X)) * n
+  }
   
   # OLS VCOV
   ee <- crossprod(e)[1,1]
