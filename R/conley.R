@@ -60,7 +60,7 @@ ConleySE.lm <- function(model, x, y,
   # OLS VCOV
   ee <- crossprod(e)[1,1]
   #V_ols <- (ee/(n-k)) * invXX / n
-  V_ols <- vcov(m1)
+  V_ols <- vcov(model)
   
   # VCOV with spatial correlation adjustment
   V_spatial <- invXX %*% (XeeX / n) %*% invXX / n
