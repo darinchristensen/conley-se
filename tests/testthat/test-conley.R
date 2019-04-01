@@ -1,23 +1,37 @@
 context("test-conley")
 library("ConleySE")
-
+library("lfe")
 
 # Loading test data:
 data("conley_spatial")
 
 test_that("OLS model using lm() works", {
   cs2012 <- conley_spatial[conley_spatial$year == 2012,]
-  m1 <- lm(EmpClean00 ~ HDD + CDD, data = cs2012)
-  expected_res <- c(61203.928, 13.629, 37.000)
+  lm1 <- lm(EmpClean00 ~ HDD + CDD, data = cs2012)
+  
+  felm1 <- felm(EmpClean00 ~ HDD + CDD | 0 | 0 | latitude + longitude,
+            data = cs2012, keepCX = TRUE)
+  
+  
+  expected_res <- c(56599.358, 12.971, 35.198)
   names(expected_res) <- c("(Intercept)", "HDD", "CDD")
-  vcov_spatial <- ConleySE(model = m1,
+  lm_vcov_spatial <- ConleySE(model = lm1,
                  x = cs2012$longitude,
                  y = cs2012$latitude,
                  dist_fn = "SH", dist_cutoff = 500, 
                  verbose = FALSE) 
   
-  se_spatial <- round(sqrt(diag(vcov_spatial)), 3)
+  felm_vcov_spatial <- ConleySE(model = felm1,
+                                x_var = "longitude",
+                                y_var = "latitude",
+                              dist_fn = "SH", dist_cutoff = 500, 
+                              verbose = FALSE) 
+  
+  
+  lm_se_spatial <- round(sqrt(diag(lm_vcov_spatial)), 3)
+  felm_se_spatial <- round(sqrt(diag(felm_vcov_spatial$Spatial)), 3)
   expect_equal(se_spatial, expected_res)
+  expect_equal(felm_se_spatial, expected_res)
 })
 
 test_that("Fixed effects model using plm::plm() matches expected results", {
@@ -42,6 +56,12 @@ test_that("Fixed effects model using plm::plm() matches expected results", {
 
 test_that("Fixed effects model using lfe::felm() matches expected results", {
   if(require(lfe)) {
+    # Note that the original test results are for mislabelled latitude and
+    # longitude variables, so we have to rename them here for the test to 
+    # work and match results from Darin Christensen's repo. The data in this 
+    # package are correctly labelled.
+    names(conley_spatial)[6:7] <- c("latitude", "longitude")
+    
     expected_res <- matrix(c(0.650, 1.493, 0.886, 4.065, 0.721, 3.631), 
                            nrow = 2,
                            byrow = FALSE)
@@ -64,5 +84,4 @@ test_that("Fixed effects model using lfe::felm() matches expected results", {
   } else {
     message("Error: package 'lfe' not installed.")
   }
-  
 })

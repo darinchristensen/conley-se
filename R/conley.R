@@ -97,27 +97,30 @@ ConleySE.felm <- function(model,
   
   if(cores > 1) { invisible(require(parallel)) }
 
-  Xvars <- rownames(model$coefficients)
+  Yvars <- colnames(model$cY) 
+  Xvars <- colnames(model$cX)
   df <- data.frame(model$cY, 
-                  model$cX,
-                  fe1 = Fac2Num(model$fe[[1]]),
-                  fe2 = Fac2Num(model$fe[[2]]),
-                  coord1 = Fac2Num(model$clustervar[[1]]),
-                  coord2 = Fac2Num(model$clustervar[[2]]))
-  setnames(df,
-           c("fe1", "fe2", "coord1", "coord2"),
-           c(names(model$fe), names(model$clustervar)))
+                  model$cX)
+  names(df) <- c(Yvars, Xvars)
+  
+  for(v in names(model$fe)) {
+    df[[v]] <- Fac2Num(model$fe[[v]]) 
+  }
+  for(v in names(model$clustervar)) {
+    df[[v]] <- Fac2Num(model$clustervar[[v]]) 
+  }
   df$e <- as.numeric(model$residuals)
   vcv <- model$vcv
   
   n <- nrow(df)      # number of observations
   k <- length(Xvars) # number of covariates
-  
-  # Renaming variables:
-  orig_names <- c(id_var, time_var, x_var, y_var)
-  new_names <- c("id", "time", "x", "y")
-  setnames(df, orig_names, new_names)
-  
+ 
+  # Deal with time and id variables
+  if(missing(id_var)) { df$id <- 1; id_var <- "id" }
+  if(missing(time_var)) { df$time <- 1; time_var <- "time" }
+  df <- df[, c(Yvars, Xvars, id_var, time_var, x_var, y_var, "e")]
+  names(df) <- c(Yvars, Xvars, "id", "time", "x", "y", "e")
+
   # Empty Matrix:
   XeeX <- matrix(nrow = k, ncol = k, 0)
   
@@ -129,7 +132,7 @@ ConleySE.felm <- function(model,
   if(verbose){ message("Starting to loop over time periods...") }
   
   if(balanced_pnl){
-    sub_df <- df[df$time == times[1],]
+    sub_df <- df[df$time == times[1],] 
     y <- sub_df$y
     x <- sub_df$x 
     rm(sub_df)
@@ -138,6 +141,8 @@ ConleySE.felm <- function(model,
     
     d <- DistMat(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
     rm(list = c("y", "x"))
+  } else {
+    
   }
   
   if(cores == 1) {
@@ -176,7 +181,6 @@ ConleySE.felm <- function(model,
   invXX <- solve(t(X) %*% X) * n
   
   V_spatial <- invXX %*% (XeeX / n) %*% invXX / n
-  
   V_spatial <- (V_spatial + t(V_spatial)) / 2
   
   if(verbose) {message("Computed Spatial VCOV.")}
@@ -231,8 +235,8 @@ ConleySE.felm <- function(model,
 #' Iterate observations
 iterateObs <- function(df, Xvars, dist_matrix, sub_index, type, cutoff, balanced_pnl,
                        verbose, kernel, dist_fn) {
-
   k <- length(Xvars)
+  
   
   if(type == "spatial") {
     sub_df <- df[df$time == sub_index,]
