@@ -30,7 +30,7 @@ test_that("OLS model using lm() works", {
   
   lm_se_spatial <- round(sqrt(diag(lm_vcov_spatial)), 3)
   felm_se_spatial <- round(sqrt(diag(felm_vcov_spatial$Spatial)), 3)
-  expect_equal(se_spatial, expected_res)
+  expect_equal(lm_se_spatial, expected_res)
   expect_equal(felm_se_spatial, expected_res)
 })
 

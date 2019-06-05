@@ -1,6 +1,12 @@
+/*
+ *
+ * This code originally by Darin Christensen:
+ * https://github.com/darinchristensen/conley-se
+ *
+ * */
 #include <iostream>
 #include <math.h>
-#define ARMA_64BIT_WORD
+#define ARMA_64BIT_WORD 1
 #include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 
@@ -49,8 +55,16 @@ double haversine_cpp(double lat1, double long1,
 
 // Distance Formula used by SH:
 double sh_cpp(double lat1, double long1,
-              double lat2, double long2) {
+              double lat2, double long2,
+              std::string unit="km"){
   double distance = pow(pow(111 * (lat1 - lat2), 2) + pow(cos(lat1 * 3.1415927 / 180) * 111 * (long1 - long2), 2), .5);
+
+  
+  /* if it is anything *but* km it is miles */
+  if(unit != "km"){
+    return(distance*0.621371);
+  }
+  
   return(distance);
 }
 

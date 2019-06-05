@@ -1,3 +1,27 @@
+#' Calculate the inverse of a matrix.
+#' 
+#' @param X a matrix.
+#' @return an inverted matrix.
+inverse <- function(X) {
+  if(require(corpcor)) {
+    inv <- corpcor::pseudoinverse(crossprod(X))
+  } else if(require(MASS)) {
+    inv <- MASS::ginv(X)
+  } else {
+    inv <- tryCatch(solve(crossprod(X)), error = function(e) e)
+    if(class(inv) == "error") {
+      stop("Matrix is computationally singular. Please install packages 'MASS' or 'corpcor' for pseudoinverse calculations.")
+    }
+  }
+  
+  # Keep column names if they exist
+  if(is.null(colnames(inv)) & !is.null(colnames(X))) {
+    colnames(inv) <- colnames(X)
+    rownames(inv) <- colnames(X)
+  }
+  inv
+}
+
 #' Calculate Conley Standard Errors for cross-sectional data.
 #'
 #' This function calculates standard errors for spatially correlated
@@ -17,8 +41,10 @@
 #' @return a variance-covariance matrix
 ConleySE <- function(...) { UseMethod("ConleySE") }
 
+
 #' @export 
 ConleySE.matrix <- function(X) {}
+
 
 #' Calculate spatially correlated variance-covariance matrix from a lm object.
 #' 
@@ -49,13 +75,7 @@ ConleySE.lm <- function(model, x, y,
   XeeX <- Bal_XeeXhC(d, X, e, n, k)
   
   # (X'X)^-1
-  if(require(corpcor)) {
-    invXX <- corpcor::pseudoinverse(crossprod(X)) * n
-    rownames(invXX) <- X_vars
-    colnames(invXX) <- X_vars
-  } else {
-    invXX <- solve(crossprod(X)) * n
-  }
+  invXX <- inverse(X) * n
   
   # OLS VCOV
   ee <- crossprod(e)[1,1]
@@ -178,7 +198,9 @@ ConleySE.felm <- function(model,
   
   # Generate VCE for only cross-sectional spatial correlation:
   X <- as.matrix(df[, Xvars])
-  invXX <- solve(t(X) %*% X) * n
+  
+  # (X'X)^-1
+  invXX <- inverse(X) * n
   
   V_spatial <- invXX %*% (XeeX / n) %*% invXX / n
   V_spatial <- (V_spatial + t(V_spatial)) / 2

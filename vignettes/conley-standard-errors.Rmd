@@ -23,10 +23,13 @@ This vignette documents the history and use of this package, which is essentiall
 Usage is similar to the use of variance-covariance matrices from the package `sandwhich`:
 
 ```{r echo=TRUE}
+library(ConleySE)
+library(lmtest)
+library(sandwich)
 data(conley_spatial)
 
 # For cross-sectional data, limit to one year:
-cs2012 <- conley_spatial[conley_spatial$year == 2012]
+cs2012 <- conley_spatial[conley_spatial$year == 2012,]
 m1 <- lm(EmpClean00 ~ HDD + CDD, data = cs2012)
 
 vcov_spatial <- ConleySE(model = m1,
@@ -38,8 +41,6 @@ vcov_spatial <- ConleySE(model = m1,
 coeftest(m1) #OLS
 coeftest(m1, vcov = vcovHC(m1, type = "HC1")) # Robust standard errors as in Stata
 coeftest(m1, vcov = vcov_spatial) #Spatial SEs
-
-
 ```
 
 
