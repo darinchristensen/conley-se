@@ -1,0 +1,132 @@
+---
+title: "Robust, Clustered, and Spatially Correlated Standard Errors in R"
+author: "Nicholas Potter"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r}
+library(ConleySE)
+library(plm)
+library(sandwich)
+library(lfe)
+library(lmtest)
+
+data(conley_spatial)
+conley_spatial$st_fips <- substr(conley_spatial$FIPS,1,2)
+panel <- pdata.frame(conley_spatial, index = c("FIPS", "year"))
+```
+
+### Panel Models
+
+These are equivalent ways of specifying the models. Coefficients are equal.
+```{r}
+
+## lm() one without and one with the intercept for comparison
+# Everything should be the same
+m0 <- lm(EmpClean00 ~ HDD + CDD + factor(FIPS) - 1, data = conley_spatial)
+m1 <- lm(EmpClean00 ~ HDD + CDD + factor(FIPS), data = conley_spatial)
+
+## plm::plm() These two are equivalent
+#pm <- plm(EmpClean00 ~ HDD + CDD, 
+#          data = conley_spatial, index = c("FIPS", "year"), model = "within")
+pm <- plm(EmpClean00 ~ HDD + CDD, 
+          data = panel, model = "within")
+
+## lfe::felm() 
+fe <- felm(EmpClean00 ~ HDD + CDD | FIPS, 
+           data = conley_spatial)
+```
+
+Standard errors are also equivalent:
+
+```{r}
+sqrt(diag(vcov(m)[2:3,2:3]))
+sqrt(diag(vcov(pm)[1:2,1:2]))
+sqrt(diag(vcov(fe)[1:2,1:2]))
+```
+
+Robust standard errors clustered on FIPS:
+```{r}
+### Small sample adjustments to apply manually to plm models
+g <- pdim(pm)$nT$n # groups
+n <- pdim(pm)$nT$N # observations
+k <- length(coefficients(pm)) # coefficients
+adj_k1 <- (g/(g-1) * (n-1)/(n-k-1)) # k <- k + 1 because Stata assumes intercept in FE model
+adj <- (g/(g-1)) * (n-1)/(n-k)   # k if no intercept in FE model
+
+
+### Robust but not clustered
+sqrt(diag(vcovHC(m1, type = "HC0")[2:3,2:3]))
+sqrt(diag(vcovHC(m0, type = "HC0")[1:2,1:2]))
+
+### Clustered by FIPS without small-sample adjustment
+sqrt(diag(vcovCL(m, cluster = conley_spatial$FIPS, cadjust = FALSE)[1:2,1:2])) 
+sqrt(diag(vcovHC(pm, type = "HC1")[1:2,1:2])) # Clustered by group
+sqrt(diag(vcovHC(pm, cluster = "group")[1:2,1:2])) # Same clustering by group
+
+### Clustered with small sample adjustment
+sqrt(diag(vcovCL(m0, cluster = conley_spatial$FIPS)[1:2,1:2]))
+fe2 <- felm(EmpClean00 ~ HDD + CDD | FIPS | 0 | FIPS, 
+           data = conley_spatial)
+fe2$cse
+
+sqrt(diag(adj * vcovHC(pm, type = "HC1")[1:2,1:2])) # Clustered by group
+
+
+
+## For PLM, we have to adjust the vcov matrix manually
+
+### Cluster by group and time
+sqrt(diag(vcovDC(pm)))
+
+```
+
+
+```{r}
+pm1 <- plm(EmpClean00 ~ HDD + CDD, 
+          data = panel, model = "within", effect = "twoways")
+
+fe1 <- felm(EmpClean00 ~ HDD + CDD | FIPS + year, 
+           data = conley_spatial)
+
+sqrt(diag(vcov(pm1)))
+sqrt(diag(vcov(fe1)))
+
+
+fe1 <- felm(EmpClean00 ~ HDD + CDD | FIPS + year | 0 | longitude + latitude, 
+           data = conley_spatial, keepCX=TRUE)
+
+g <- pdim(pm1)$nT$n # groups
+n <- pdim(pm1)$nT$N # observations
+t <- pdim(pm1)$nT$T # times
+k <- length(coefficients(pm1)) # coefficients
+adj_k1 <- (g/(g-1) * (n-1)/(n-k-1)) # k <- k + 1 because Stata assumes intercept in FE model
+adj <- (g/(g-1)) * (n-1)/(n-k)   # k if no intercept in FE model
+adj_tw <- (g/(g-1) * (n-1)/(n-k-1-(t-1))) # two-way adjustment for times also
+
+sqrt(diag(adj_tw * vcovDC(pm1)))
+sqrt(diag(adj_k1 * vcovHC(pm1, cluster = "group")))
+sqrt(diag(vcov(fe1)))
+
+pm_spatial <- vcovConley(pm1, x = panel$longitude, y = panel$latitude)
+fe_spatial <- vcovConley(fe1, x_var = "longitude", y_var = "latitude",
+                         id_var = "FIPS", 
+                         time_var = "year")
+sqrt(diag(pm_spatial$Spatial_HAC))
+sqrt(diag(fe_spatial$Spatial_HAC))
+
+```

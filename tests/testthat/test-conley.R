@@ -1,11 +1,10 @@
 context("test-conley")
 library("ConleySE")
-library("lfe")
 
 # Loading test data:
 data("conley_spatial")
 
-test_that("OLS model using lm() works", {
+test_that("OLS model using lm() and felm() works", {
   cs2012 <- conley_spatial[conley_spatial$year == 2012,]
   lm1 <- lm(EmpClean00 ~ HDD + CDD, data = cs2012)
   
@@ -13,15 +12,15 @@ test_that("OLS model using lm() works", {
             data = cs2012, keepCX = TRUE)
   
   
-  expected_res <- c(56599.358, 12.971, 35.198)
+  expected_res <- c(61203.928, 13.629, 37.000)
   names(expected_res) <- c("(Intercept)", "HDD", "CDD")
-  lm_vcov_spatial <- ConleySE(model = lm1,
+  lm_vcov_spatial <- vcovConley(model = lm1,
                  x = cs2012$longitude,
                  y = cs2012$latitude,
                  dist_fn = "SH", dist_cutoff = 500, 
                  verbose = FALSE) 
   
-  felm_vcov_spatial <- ConleySE(model = felm1,
+  felm_vcov_spatial <- vcovConley(model = felm1,
                                 x_var = "longitude",
                                 y_var = "latitude",
                               dist_fn = "SH", dist_cutoff = 500, 
@@ -37,8 +36,8 @@ test_that("OLS model using lm() works", {
 test_that("Fixed effects model using plm::plm() matches expected results", {
   if(require(plm)) {
     
-    pdf <- pdata.frame(conley_spatial, index = c("FIPS", "year"), drop.index = F, row.names = T)
-    pm1 <- plm(EmpClean00 ~ HDD + CDD, data = pdf[pdf$year == 2012,], model = "pooling")
+    pd <- pdata.frame(conley_spatial, index = c("FIPS", "year"), drop.index = F, row.names = T)
+    pm1 <- plm(EmpClean00 ~ HDD + CDD, data = pd, model = "within")
     
     G <- length(unique(pdf$FIPS))
     N <- nrow(pdf)
@@ -47,7 +46,13 @@ test_that("Fixed effects model using plm::plm() matches expected results", {
     # display with cluster VCE and df-adjustment
     firm_c_vcov <- dfa * vcovHC(pm1, type = "HC0", cluster = "group", adjust = T)
     coeftest(pm1, vcov = firm_c_vcov)
-    
+   
+    plm_vcov_spatial <- vcovConley(pm1, x = pd$longitude, y = pd$latitude,                    
+                               dist_fn = "SH", dist_cutoff = 500, 
+                               lag_cutoff = 5,
+                               cores = 1, 
+                               verbose = FALSE)
+    coeftest(pm1, vcov = plm_vcov_spatial) 
   } else {
     message("Error: package 'plm' not installed.")
     FALSE
@@ -68,10 +73,10 @@ test_that("Fixed effects model using lfe::felm() matches expected results", {
     colnames(expected_res) <- c("OLS", "Spatial", "Spatial_HAC")
     rownames(expected_res) <- c("HDD", "CDD")
     
-    m <- felm(EmpClean00 ~ HDD + CDD | year + FIPS | 0 | latitude + longitude,
+    fe1 <- felm(EmpClean00 ~ HDD + CDD | year + FIPS | 0 | latitude + longitude,
               data = conley_spatial[!is.na(conley_spatial$EmpClean00),], keepCX = TRUE)
     
-    SE <- ConleySE(model = m,
+    vcov <- vcovConley(model = fe1,
                    id_var = "FIPS", 
                    time_var = "year",
                    x_var = "longitude", y_var = "latitude",
@@ -79,7 +84,7 @@ test_that("Fixed effects model using lfe::felm() matches expected results", {
                    lag_cutoff = 5,
                    cores = 1, 
                    verbose = FALSE) 
-    res <- sapply(SE, function(x) round(diag(sqrt(x)), 3))
+    res <- sapply(vcov, function(x) round(diag(sqrt(x)), 3))
     expect_equal(res, expected_res)
   } else {
     message("Error: package 'lfe' not installed.")
