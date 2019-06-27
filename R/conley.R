@@ -66,6 +66,7 @@ vcovConley.matrix <- function(X, wgts, e, x, y, kernel, dist_fn, dist_cutoff,
   # OLS VCOV
   ee <- crossprod(e)[1,1]
   V_ols <- (ee/(n-k)) * invXX / n
+  #V_ols <- vcov(model)
   
   # VCOV with spatial correlation adjustment
   V_spatial <- invXX %*% (XeeX / n) %*% invXX / n
