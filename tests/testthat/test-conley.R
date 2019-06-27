@@ -46,7 +46,7 @@ test_that("Fixed effects model using plm::plm() matches expected results", {
     
     # display with cluster VCE and df-adjustment
     firm_c_vcov <- dfa * vcovHC(pm1, type = "HC0", cluster = "group", adjust = T)
-    coeftest(pm1, vcov = firm_c_vcov)
+    lmtest::coeftest(pm1, vcov = firm_c_vcov)
     
   } else {
     message("Error: package 'plm' not installed.")
