@@ -55,7 +55,7 @@ vcovConley.matrix <- function(X, wgts, e, x, y, kernel, dist_fn, dist_cutoff,
   k <- ncol(X)
   
   # Calculate the distance matrix
-  d <- DistMat(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
+  d <- DistMatrix(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
   
   # Spatial correlation matrix
   XeeX <- Bal_XeeXhC(d, X, e, n, k)
@@ -146,7 +146,7 @@ vcovConley.plm <- function(model, x, y,
     
     if(verbose){ message("Computing Distance Matrix...") }
     
-    d <- DistMat(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
+    d <- DistMatrix(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
     rm(list = c("y", "x"))
   } else {
     
@@ -305,7 +305,7 @@ vcovConley.felm <- function(model,
     
     if(verbose){ message("Computing Distance Matrix...") }
     
-    d <- DistMat(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
+    d <- DistMatrix(cbind(y, x), cutoff = dist_cutoff, kernel, dist_fn)
     rm(list = c("y", "x"))
   } else {
     

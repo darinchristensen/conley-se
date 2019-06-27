@@ -81,7 +81,7 @@ double sh_cpp(double lat1, double long1,
 //' @param dist_fn (string) a distance function.
 //'
 // [[Rcpp::export]]
-arma::mat DistMat(arma::mat M, double cutoff,
+arma::mat DistMatrix(arma::mat M, double cutoff,
                   std::string kernel="bartlett",
                   std::string dist_fn="Haversine"){
 

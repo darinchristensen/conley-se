@@ -10,8 +10,8 @@
 #' @param kernel (string) a kernel function.
 #' @param dist_fn (string) a distance function.
 #'
-DistMat <- function(M, cutoff, kernel = "bartlett", dist_fn = "Haversine") {
-    .Call('_ConleySE_DistMat', PACKAGE = 'ConleySE', M, cutoff, kernel, dist_fn)
+DistMatrix <- function(M, cutoff, kernel = "bartlett", dist_fn = "Haversine") {
+    .Call('_ConleySE_DistMatrix', PACKAGE = 'ConleySE', M, cutoff, kernel, dist_fn)
 }
 
 #' Calculate the correlation matrix.
