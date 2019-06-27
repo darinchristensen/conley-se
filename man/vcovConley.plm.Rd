@@ -6,8 +6,7 @@
 \usage{
 \method{vcovConley}{plm}(model, x, y, kernel = "bartlett",
   dist_fn = "Haversine", dist_cutoff = 500, lag_cutoff = 5,
-  lat_scale = 111, verbose = FALSE, cores = 1,
-  balanced_pnl = FALSE)
+  lat_scale = 111, verbose = FALSE, cores = 1)
 }
 \description{
 Conley Spatial Variance-Covariances for Panel Models fit with plm.

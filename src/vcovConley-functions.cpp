@@ -26,11 +26,11 @@ double to_radians_cpp(double degrees){
 
 // ------------------------------------------
 
-// Haversine Formula:
-double haversine_cpp(double lat1, double long1,
-                     double lat2, double long2,
+// Haversine Formula
+double haversine_cpp(double long1, double lat1,
+                     double long2, double lat2,
                      std::string unit="km"){
-  int radius = 6378;
+  double radius = 6378.137;
   double delta_phi = to_radians_cpp(lat2 - lat1);
   double delta_lambda = to_radians_cpp(long2 - long1);
   double phi1 = to_radians_cpp(lat1);
@@ -53,9 +53,10 @@ double haversine_cpp(double lat1, double long1,
 // ------------------------------------------
 
 
-// Distance Formula used by SH:
-double sh_cpp(double lat1, double long1,
-              double lat2, double long2,
+// Distance Formula used by SH
+// [[Rcpp::export]]
+double sh_cpp(double long1, double lat1,
+              double long2, double lat2,
               std::string unit="km"){
   double distance = pow(pow(111 * (lat1 - lat2), 2) + pow(cos(lat1 * 3.1415927 / 180) * 111 * (long1 - long2), 2), .5);
 

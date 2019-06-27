@@ -68,18 +68,22 @@ test_that("Fixed effects model using lfe::felm() matches expected results", {
     # longitude variables, so we have to rename them here for the test to 
     # work and match results from Darin Christensen's repo. The data in this 
     # package are correctly labelled.
-    names(conley_spatial)[6:7] <- c("latitude", "longitude")
+    res_vector <- c(0.650, 1.493, 0.886, 4.065, 0.721, 3.631)
     
-    expected_res <- matrix(c(0.650, 1.493, 0.886, 4.065, 0.721, 3.631), 
-                           nrow = 2,
-                           byrow = FALSE)
+    # had an error as per https://darinchristensen.com/post/2017-08-21-correction/
+    res_vector_old <- c(0.650, 1.493, 0.886, 4.065, 0.895, 4.386) 
+    
+    expected_res <- matrix(res_vector, 
+                            nrow = 2,
+                            byrow = FALSE)
     colnames(expected_res) <- c("OLS", "Spatial", "Spatial_HAC")
     rownames(expected_res) <- c("HDD", "CDD")
+    
     
     m <- felm(EmpClean00 ~ HDD + CDD | year + FIPS | 0 | latitude + longitude,
               data = conley_spatial[!is.na(conley_spatial$EmpClean00),], keepCX = TRUE)
     
-    SE <- vcovConley(model = m,
+    vcov <- vcovConley(model = m,
                    id_var = "FIPS", 
                    time_var = "year",
                    x_var = "longitude", y_var = "latitude",
@@ -87,7 +91,7 @@ test_that("Fixed effects model using lfe::felm() matches expected results", {
                    lag_cutoff = 5,
                    cores = 1, 
                    verbose = FALSE) 
-    res <- sapply(SE, function(x) round(diag(sqrt(x)), 3))
+    res <- sapply(vcov, function(x) round(diag(sqrt(x)), 3))
     expect_equal(res, expected_res)
   } else {
     message("Error: package 'lfe' not installed.")

@@ -6,9 +6,24 @@
 
 using namespace Rcpp;
 
+// sh_cpp
+double sh_cpp(double long1, double lat1, double long2, double lat2, std::string unit);
+RcppExport SEXP _vcovConley_sh_cpp(SEXP long1SEXP, SEXP lat1SEXP, SEXP long2SEXP, SEXP lat2SEXP, SEXP unitSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type long1(long1SEXP);
+    Rcpp::traits::input_parameter< double >::type lat1(lat1SEXP);
+    Rcpp::traits::input_parameter< double >::type long2(long2SEXP);
+    Rcpp::traits::input_parameter< double >::type lat2(lat2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type unit(unitSEXP);
+    rcpp_result_gen = Rcpp::wrap(sh_cpp(long1, lat1, long2, lat2, unit));
+    return rcpp_result_gen;
+END_RCPP
+}
 // DistMatrix
 arma::mat DistMatrix(arma::mat M, double cutoff, std::string kernel, std::string dist_fn);
-RcppExport SEXP _ConleySE_DistMatrix(SEXP MSEXP, SEXP cutoffSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
+RcppExport SEXP _vcovConley_DistMatrix(SEXP MSEXP, SEXP cutoffSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +37,7 @@ END_RCPP
 }
 // XeeXhC
 arma::mat XeeXhC(arma::mat M, double cutoff, arma::mat X, arma::vec e, int n1, int k, std::string kernel, std::string dist_fn);
-RcppExport SEXP _ConleySE_XeeXhC(SEXP MSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
+RcppExport SEXP _vcovConley_XeeXhC(SEXP MSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,7 +55,7 @@ END_RCPP
 }
 // Bal_XeeXhC
 arma::mat Bal_XeeXhC(arma::mat dmat, arma::mat X, arma::vec e, int n1, int k);
-RcppExport SEXP _ConleySE_Bal_XeeXhC(SEXP dmatSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP) {
+RcppExport SEXP _vcovConley_Bal_XeeXhC(SEXP dmatSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -55,7 +70,7 @@ END_RCPP
 }
 // XeeXhC_Lg
 arma::mat XeeXhC_Lg(arma::mat M, double cutoff, arma::mat X, arma::vec e, int n1, int k, std::string kernel, std::string dist_fn);
-RcppExport SEXP _ConleySE_XeeXhC_Lg(SEXP MSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
+RcppExport SEXP _vcovConley_XeeXhC_Lg(SEXP MSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP, SEXP kernelSEXP, SEXP dist_fnSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -73,7 +88,7 @@ END_RCPP
 }
 // TimeDist
 arma::mat TimeDist(arma::vec times, double cutoff, arma::mat X, arma::vec e, int n1, int k);
-RcppExport SEXP _ConleySE_TimeDist(SEXP timesSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP) {
+RcppExport SEXP _vcovConley_TimeDist(SEXP timesSEXP, SEXP cutoffSEXP, SEXP XSEXP, SEXP eSEXP, SEXP n1SEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -89,15 +104,16 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ConleySE_DistMatrix", (DL_FUNC) &_ConleySE_DistMatrix, 4},
-    {"_ConleySE_XeeXhC", (DL_FUNC) &_ConleySE_XeeXhC, 8},
-    {"_ConleySE_Bal_XeeXhC", (DL_FUNC) &_ConleySE_Bal_XeeXhC, 5},
-    {"_ConleySE_XeeXhC_Lg", (DL_FUNC) &_ConleySE_XeeXhC_Lg, 8},
-    {"_ConleySE_TimeDist", (DL_FUNC) &_ConleySE_TimeDist, 6},
+    {"_vcovConley_sh_cpp", (DL_FUNC) &_vcovConley_sh_cpp, 5},
+    {"_vcovConley_DistMatrix", (DL_FUNC) &_vcovConley_DistMatrix, 4},
+    {"_vcovConley_XeeXhC", (DL_FUNC) &_vcovConley_XeeXhC, 8},
+    {"_vcovConley_Bal_XeeXhC", (DL_FUNC) &_vcovConley_Bal_XeeXhC, 5},
+    {"_vcovConley_XeeXhC_Lg", (DL_FUNC) &_vcovConley_XeeXhC_Lg, 8},
+    {"_vcovConley_TimeDist", (DL_FUNC) &_vcovConley_TimeDist, 6},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_ConleySE(DllInfo *dll) {
+RcppExport void R_init_vcovConley(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

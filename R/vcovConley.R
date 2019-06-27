@@ -1,12 +1,12 @@
-#' @title ConleySE-package
+#' @title vcovConley-package
 #' 
 #' @description Functions to calculate conley standard errors.
 #' 
 #' @author Nicholas Potter
 #' @docType package
-#' @name ConleySE
-#' @aliases ConleySE
-#' @useDynLib ConleySE
+#' @name vcovConley
+#' @aliases vcovConley
+#' @useDynLib vcovConley
 #' @importFrom Rcpp sourceCpp
 NULL
 

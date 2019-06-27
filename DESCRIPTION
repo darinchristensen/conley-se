@@ -1,6 +1,6 @@
-Package: ConleySE
-Title: Functions to calculate Conley Standard Errors
-Version: 0.0.0.9001
+Package: vcovConley
+Title: Functions to calculate Conley's spatially-adjusted variance-covariance matrix
+Version: 0.0.0.9002
 Authors@R: person("Nicholas", "Potter", email = "potter.nicholas@gmail.com", role = c("aut", "cre"))
 Description: Functions to calculate Conley Standard Errors. This package is 
   essentially a repackaging of work done by 
@@ -16,6 +16,7 @@ Imports:
   Rcpp,
   RcppArmadillo
 Suggests:
+  geosphere,
   knitr,
   rmarkdown,
   testthat
