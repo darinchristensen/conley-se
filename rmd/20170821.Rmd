@@ -42,7 +42,7 @@ The fix is simple: the third parenthesis needs to be moved to the end of the lin
 Our old and new code is now posted in a public GitHub repo: https://github.com/darinchristensen/conley-se . 
 
 ***
-#### Original Code
+### Original Code
 
 Here's the original Stata implementation.
 
@@ -96,7 +96,7 @@ This matches the standard errors from the Stata output.
 
 *** 
 
-#### Corrected Code
+### Corrected Code
 
 Jordan caught the transcribed error on line 183 of our C++ code. Per Newey and West (1987), we correct `(1 - t_diff[j]) / (cutoff + 1)` to `(1 - t_diff[j] / (cutoff + 1))` and recompute the standard errors. 
 
