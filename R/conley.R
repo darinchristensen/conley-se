@@ -41,7 +41,7 @@ vcovConley <- function(...) { UseMethod("vcovConley") }
 #' @param model a model object.
 #' @param kernel kernel for weights.
 #' @param dist_fn distance function.
-#' @param dist_cutoff distance for cutoff.
+#' @param dist_cutoff distance for cutoff (km).
 #' @param lat_scale scale.
 #' @param verbose verbose output.
 #' @return a variance-covariance matrix.

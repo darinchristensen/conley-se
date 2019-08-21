@@ -1,5 +1,5 @@
 context("test-conley")
-library("ConleySE")
+library("vcovConley")
 library("lfe")
 
 # Loading test data:
