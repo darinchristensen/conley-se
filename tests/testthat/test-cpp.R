@@ -1,5 +1,5 @@
 context("test-cpp")
-library(ConleySE)
+library(vcovConley)
 
 data("conley_spatial")
 

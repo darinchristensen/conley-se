@@ -12,7 +12,7 @@
 
 \item{dist_fn}{distance function.}
 
-\item{dist_cutoff}{distance for cutoff.}
+\item{dist_cutoff}{distance for cutoff (km).}
 
 \item{lat_scale}{scale.}
 
