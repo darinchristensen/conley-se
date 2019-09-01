@@ -1,5 +1,6 @@
 context("test-conley")
 library("vcovConley")
+library("lmtest")
 library("lfe")
 
 # Loading test data:

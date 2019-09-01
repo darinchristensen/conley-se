@@ -1,4 +1,8 @@
 inst/doc
+
+data-raw/*.rds
+
+
 # History files
 .Rhistory
 .Rapp.history

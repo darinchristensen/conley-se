@@ -1,8 +1,6 @@
 context("test-cpp")
 library(vcovConley)
 
-data("conley_spatial")
-
 test_that("DistMatrix() works with 'SH' distance function", {
   x <- c(-120,-115, -112)
   y <- c(45, 44.5, 42.1)
