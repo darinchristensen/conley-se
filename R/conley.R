@@ -37,6 +37,7 @@ inverse <- function(X) {
 vcovConley <- function(...) { UseMethod("vcovConley") }
 
 #' Conley Spatial Variance-Covariances for matrices.
+#' 
 #' @export 
 #' @param model a model object.
 #' @param kernel kernel for weights.
@@ -55,7 +56,7 @@ vcovConley.matrix <- function(X, wgts, e, x, y, kernel, dist_fn, dist_cutoff,
   k <- ncol(X)
   
   # Calculate the distance matrix
-  d <- DistMatrix(cbind(x, y), cutoff = dist_cutoff, kernel, dist_fn)
+  d <- DistMatrix(as.matrix(cbind(x, y)), cutoff = dist_cutoff, kernel, dist_fn)
   
   # Spatial correlation matrix
   XeeX <- Bal_XeeXhC(d, X, e, n, k)

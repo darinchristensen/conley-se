@@ -1,25 +1,18 @@
-/*
- *
- * This code originally by Darin Christensen:
- * https://github.com/darinchristensen/conley-se
- *
- * */
-#include <iostream>
-#include <math.h>
-#define ARMA_64BIT_WORD 1
-#include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
-
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins(cpp11)]]
-
+#define ARMA_64BIT_WORD
+#include <RcppArmadillo.h>
+#include <iostream>
+////#include <math>
+#include <string>
 using namespace Rcpp;
 using namespace arma;
 
-// ------------------------------------------
+
+// [[Rcpp::plugins(cpp11)]]
 
 
-double to_radians_cpp(double degrees){
+
+double rcpp_to_radians(double degrees){
   return(degrees * 3.141593 / 180);
 }
 
@@ -27,14 +20,14 @@ double to_radians_cpp(double degrees){
 // ------------------------------------------
 
 // Haversine Formula
-double haversine_cpp(double long1, double lat1,
+double rcpp_haversine(double long1, double lat1,
                      double long2, double lat2,
                      std::string unit="km"){
   double radius = 6378.137;
-  double delta_phi = to_radians_cpp(lat2 - lat1);
-  double delta_lambda = to_radians_cpp(long2 - long1);
-  double phi1 = to_radians_cpp(lat1);
-  double phi2 = to_radians_cpp(lat2);
+  double delta_phi = rcpp_to_radians(lat2 - lat1);
+  double delta_lambda = rcpp_to_radians(long2 - long1);
+  double phi1 = rcpp_to_radians(lat1);
+  double phi2 = rcpp_to_radians(lat2);
   double term1 = pow(sin(delta_phi / 2), 2);
   double term2 = cos(phi1) * cos(phi2) * pow(sin(delta_lambda/2), 2);
   double the_terms = term1 + term2;
@@ -83,8 +76,8 @@ double sh_cpp(double long1, double lat1,
 //'
 // [[Rcpp::export]]
 arma::mat DistMatrix(arma::mat M, double cutoff,
-                  std::string kernel="bartlett",
-                  std::string dist_fn="Haversine"){
+                     std::string kernel="bartlett",
+                     std::string dist_fn="Haversine"){
 
   long long int nrow = M.n_rows;
   arma::mat dmat(nrow, nrow, fill::zeros);
@@ -98,7 +91,7 @@ arma::mat DistMatrix(arma::mat M, double cutoff,
       if(dist_fn != "Haversine") {
         d = sh_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
       } else {
-        d = haversine_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
+        d = rcpp_haversine(M(i,0), M(i,1), M(j,0), M(j,1));
       }
 
       // Kernel:
@@ -150,7 +143,7 @@ arma::mat XeeXhC(arma::mat M, double cutoff,
       if(dist_fn != "Haversine") {
         d = sh_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
       } else {
-        d = haversine_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
+        d = rcpp_haversine(M(i,0), M(i,1), M(j,0), M(j,1));
       }
 
       // Kernel:
@@ -257,7 +250,7 @@ arma::mat XeeXhC_Lg(arma::mat M, double cutoff,
       if(dist_fn != "Haversine") {
         d = sh_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
       } else {
-        d = haversine_cpp(M(i,0), M(i,1), M(j,0), M(j,1));
+        d = rcpp_haversine(M(i,0), M(i,1), M(j,0), M(j,1));
       }
 
       // Kernel:

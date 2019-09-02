@@ -2,7 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 sh_cpp <- function(long1, lat1, long2, lat2, unit = "km") {
-    .Call('_vcovConley_sh_cpp', PACKAGE = 'vcovConley', long1, lat1, long2, lat2, unit)
+    .Call(`_vcovConley_sh_cpp`, long1, lat1, long2, lat2, unit)
 }
 
 #' Create a distance matrix.
@@ -15,7 +15,7 @@ sh_cpp <- function(long1, lat1, long2, lat2, unit = "km") {
 #' @param dist_fn (string) a distance function.
 #'
 DistMatrix <- function(M, cutoff, kernel = "bartlett", dist_fn = "Haversine") {
-    .Call('_vcovConley_DistMatrix', PACKAGE = 'vcovConley', M, cutoff, kernel, dist_fn)
+    .Call(`_vcovConley_DistMatrix`, M, cutoff, kernel, dist_fn)
 }
 
 #' Calculate the correlation matrix.
@@ -32,7 +32,7 @@ DistMatrix <- function(M, cutoff, kernel = "bartlett", dist_fn = "Haversine") {
 #' @param dist_fn (string) a distance function
 #'
 XeeXhC <- function(M, cutoff, X, e, n1, k, kernel = "bartlett", dist_fn = "Haversine") {
-    .Call('_vcovConley_XeeXhC', PACKAGE = 'vcovConley', M, cutoff, X, e, n1, k, kernel, dist_fn)
+    .Call(`_vcovConley_XeeXhC`, M, cutoff, X, e, n1, k, kernel, dist_fn)
 }
 
 #' Calculate the correlation matrix for a balanced panel.
@@ -46,7 +46,7 @@ XeeXhC <- function(M, cutoff, X, e, n1, k, kernel = "bartlett", dist_fn = "Haver
 #' @param k the number of covariates
 #'
 Bal_XeeXhC <- function(dmat, X, e, n1, k) {
-    .Call('_vcovConley_Bal_XeeXhC', PACKAGE = 'vcovConley', dmat, X, e, n1, k)
+    .Call(`_vcovConley_Bal_XeeXhC`, dmat, X, e, n1, k)
 }
 
 #' Calculate the correlation matrix for a large model. Avoids creating a 
@@ -64,7 +64,7 @@ Bal_XeeXhC <- function(dmat, X, e, n1, k) {
 #' @param dist_fn (string) a distance function
 #'
 XeeXhC_Lg <- function(M, cutoff, X, e, n1, k, kernel = "bartlett", dist_fn = "Haversine") {
-    .Call('_vcovConley_XeeXhC_Lg', PACKAGE = 'vcovConley', M, cutoff, X, e, n1, k, kernel, dist_fn)
+    .Call(`_vcovConley_XeeXhC_Lg`, M, cutoff, X, e, n1, k, kernel, dist_fn)
 }
 
 #' Calculate the correlation matrix.
@@ -79,6 +79,6 @@ XeeXhC_Lg <- function(M, cutoff, X, e, n1, k, kernel = "bartlett", dist_fn = "Ha
 #' @param k number of variables
 #'
 TimeDist <- function(times, cutoff, X, e, n1, k) {
-    .Call('_vcovConley_TimeDist', PACKAGE = 'vcovConley', times, cutoff, X, e, n1, k)
+    .Call(`_vcovConley_TimeDist`, times, cutoff, X, e, n1, k)
 }
 

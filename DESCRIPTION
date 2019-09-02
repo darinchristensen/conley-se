@@ -13,8 +13,7 @@ Description: Functions to calculate Conley Standard Errors. This package is
   original source for this package.
 Depends: R (>= 3.2.0)
 Imports:
-  Rcpp,
-  RcppArmadillo
+  Rcpp
 Suggests:
   geosphere,
   knitr,
@@ -22,7 +21,9 @@ Suggests:
   testthat
 License: MIT + file LICENSE
 LazyData: true
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: 
+  Rcpp, 
+  RcppArmadillo
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 Encoding: UTF-8

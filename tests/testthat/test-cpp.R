@@ -6,6 +6,7 @@ test_that("DistMatrix() works with 'SH' distance function", {
   y <- c(45, 44.5, 42.1)
   a <- cbind(x, y)
   d <- DistMatrix(a, cutoff = 500, dist_fn = "SH")
+  d <- vcovConley::DistMatrix(a, cutoff = 500, dist_fn = "SH")
   #print(d)
   res <- matrix(c(1,.2073015,0,.2073015,1,.2861902,0,.2861902,1), nrow = 3)
   expect_equal(round(d,5), round(res,5))
