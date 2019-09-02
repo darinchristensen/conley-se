@@ -1,14 +1,12 @@
 // [[Rcpp::depends(RcppArmadillo)]]
-#define ARMA_64BIT_WORD
+// [[Rcpp::plugins(cpp11)]]
 #include <RcppArmadillo.h>
 #include <iostream>
 ////#include <math>
 #include <string>
+
 using namespace Rcpp;
 using namespace arma;
-
-
-// [[Rcpp::plugins(cpp11)]]
 
 
 
