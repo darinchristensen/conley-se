@@ -1,3 +1,7 @@
+# Don't include cpp build files
+src/*.o
+src/*.so
+
 inst/doc
 
 data-raw/*.rds
